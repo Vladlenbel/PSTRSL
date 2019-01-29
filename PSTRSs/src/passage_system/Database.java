@@ -255,7 +255,7 @@ public class Database {
             closeDB();
         }
     	
-    	//System.out.println(answ);
+    	 //System.out.println(answ);
     	return answ;
     }
     
