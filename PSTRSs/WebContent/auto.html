@@ -1,0 +1,376 @@
+<!DOCTYPE html >
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Вспомегательная система</title>
+    <link rel="stylesheet" type="text/css" href="stylessMain.css"/>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Select2 JQuery Plugin">
+    <meta name="author" content="Igor Vaynberg">
+
+    <link href="bootstrap/css/bootstrap.css" rel="stylesheet"/>
+    <link href="prettify/prettify.css" rel="stylesheet"/>
+ 
+      <script src="js/jquery-1.7.1.min.js"></script>
+      <script src="js/jquery-ui-1.8.20.custom.min.js"></script> <!-- for sortable example -->
+      <script src="js/jquery.mousewheel.js"></script>
+      <script src="prettify/prettify.min.js"></script>
+      <script src="bootstrap/js/bootstrap.min.js"></script>
+</head>
+
+   <link href="select2-3.5.3/select2.css?ts=2015-08-29T20%3A09%3A48%2B00%3A00" rel="stylesheet"/>
+<script src="select2-3.5.3/select2.js?ts=2015-08-29T20%3A09%3A48%2B00%3A00"></script>
+
+
+
+<body>
+
+	<form >
+	<div class ="titles">		
+		<font size="5" color="black" face="Arial">Вспомегательная система </font>
+		 </div>  
+
+		 <div class ="titles1">		
+		<font size="5" color="black" face="Arial"> для автомобилиста </font>
+		 </div>
+
+
+		 <div class = "marka" >
+				Выберете марку: 
+			</div>
+			   <div class = "markaINP">
+			   		<select size="1"   id="markaSel" style="width:230px" >
+    					<option disabled selected>Выберите марку</option>
+    					<option value="Audi">Audi</option>
+    					<option value="BMW">BMW</option>
+    					<option value="Volkswagen">Volkswagen</option>
+    				
+   					</select>
+   				</div>
+
+
+   				<div class = "model" >
+				Выберете модель: 
+			</div>
+			   <div class = "modelINP">
+			   		<select size="1"   id="modelSel" style="width:230px" >
+    					<option disabled selected>Выберите модель</option>
+    					<option value="Audi">Passat</option>
+    					<option value="BMW">Arteon</option>
+    					<option value="Golf">Golf |||</option>
+    					<option value="Jetta">Jetta</option>
+    					<option value="Jetta">Tiguan</option>
+   					</select>
+   				</div>
+
+
+   			<div class = "year" >
+				Выберете год выпуска: 
+			</div>
+			   <div class = "yearINP">
+			   		<select size="1"   id="yaerSel" style="width:230px" >
+    					<option disabled selected>Выберите год</option>
+    					<option value="2018">2018</option>
+    					<option value="2017">2017</option>
+    					<option value="2016">2016</option>
+    					<option value="2015">2015</option>
+    					<option value="2014">2014</option>
+    					<option value="2013">2013</option>
+    					<option value="2012">2012</option>
+    					<option value="2011">2011</option>
+    					<option value="2010">2010</option>
+    					<option value="2009">2009</option>
+    					<option value="2008">2008</option>
+    					<option value="2007">2007</option>
+						<option value="2006">2006</option>
+						<option value="2005">2005</option>
+						<option value="2004">2004</option>
+						<option value="2003">2003</option>
+						<option value="2002">2002</option>
+						<option value="2001">2001</option>
+						<option value="2000">2000</option>
+						<option value="1999">1999</option>
+						<option value="1998">1998</option>
+						<option value="1997">1997</option>
+						<option value="1996">1996</option>
+						<option value="1995">1995</option>
+						<option value="1994">1994</option>
+						<option value="1993">1993</option>
+    					
+    				
+   					</select>
+   				</div>
+
+
+   			<div class = "modific" >
+				Выберете модификацию: 
+			</div>
+			   <div class = "modificINP">
+			   		<select size="1"   id="modificSel" style="width:230px" >
+    					<option disabled selected>Выберите модификацию</option>
+    					<option value="VW_Golf_3_5d_1992_1997_h_1781_90hp">VW_Golf_3_5d_1992_1997_h_1781_90hp</option>
+    					<option value="BMW">BMW</option>
+    					<option value="todayInf">Информация за сегодня</option>
+    				
+   					</select>
+   				</div>
+
+   			<div class = "mileage" >
+				Введите пробег автомобиля:
+			</div>
+			   <div class = "mileageINP">
+			   		<input type="text" size="24">
+   				</div>
+
+
+
+
+   			<div class = "level" >
+				Выберете уровень вашей 
+			</div>
+			<div class = "level1" >
+				подготовленности: 
+			</div>
+			   <div class = "levelINP">
+			   		<select size="1"   id="levelSel" style="width:230px" >
+    					<option disabled selected>Выберите уровень</option>
+    					<option value="Audi">Новичек</option>
+    					<option value="BMW">Эксперт</option>
+    					
+    				
+   					</select>
+   				</div>
+
+   			<div class = "field" >
+				Выберите область в которой вы хотите получить  
+			</div>
+			<div class = "field1" >
+				 консультацию: 
+			</div>
+			   <div class = "fieldINP">
+			   		<select size="1"   id="fieldSel" style="width:230px" >
+    					<option disabled selected>Выберите область</option>
+    					<option value="Audi">Плановое ТО</option>
+    					<option value="Audi">Плановое работы</option>
+    					<option value="BMW">Проблемы с подвеской</option>
+    					<option value="BMW">Проблемы с двигателем</option>
+    					<option value="BMW">Проблемы с тормозной системой</option>
+    					<option value="BMW">Проблемы с рулевой системой</option>
+    					
+    				
+   					</select>
+   				</div>
+
+
+   		<div class ="sendMesBut">
+			<input  type="button"  id= "sendMesBut" value="Отправить" /> 
+		</div>
+		    
+
+
+		<div class = "questTO1" >
+				Как давно вы меняли масло и масляной фильтр? (Если Вы не знаете укажите в пробеге 0)
+		</div>
+
+		<div class = "questTO1_1" >
+				Укажите дату:
+		</div>
+			<div  class = "questTO11INP">
+				<br><input type = "date" name = "questTO1date"><br>
+			</div>	
+
+		<div class = "questTO1_2" >
+				Укажите пробег:
+		</div>
+			<div class = "questTO12INP" >
+				 <input type="text" size="10">
+			</div>
+
+
+		<div class = "questTO2" >
+				Как давно вы меняли салонный фильтр? (Если Вы не знаете укажите в пробеге 0)
+		</div>
+
+		<div class = "questTO2_1" >
+				Укажите дату:
+		</div>
+			<div  class = "questTO21INP">
+				<br><input type = "date" name = "questTO1date"><br>
+			</div>	
+
+		<div class = "questTO2_2">
+				Укажите пробег:
+		</div>
+			<div class = "questTO22INP" >
+				 <input type="text" size="10">
+			</div>
+
+		<div class = "questTO3" >
+				Как давно вы меняли воздушный фильтр? (Если Вы не знаете укажите в пробеге 0)
+		</div>
+
+		<div class = "questTO3_1" >
+				Укажите дату:
+		</div>
+			<div  class = "questTO31INP">
+				<br><input type = "date" name = "questTO1date"><br>
+			</div>	
+
+		<div class = "questTO3_2">
+				Укажите пробег:
+		</div>
+			<div class = "questTO32INP" >
+				 <input type="text" size="10">
+		</div>
+
+		<div class = "questTO4" >
+				Как давно вы меняли ремень ГРМ/ цепь? (Если Вы не знаете укажите в пробеге 0)
+		</div>
+
+		<div class = "questTO4_1" >
+				Укажите дату:
+		</div>
+			<div  class = "questTO41INP">
+				<br><input type = "date" name = "questTO1date"><br>
+			</div>	
+
+		<div class = "questTO4_2">
+				Укажите пробег:
+		</div>
+			<div class = "questTO42INP" >
+				 <input type="text" size="10">
+		</div>
+
+		<div class = "questTO5" >
+				Как давно вы меняли охлаждающую жидкость двигателя? (Если Вы не знаете укажите в пробеге 0)
+		</div>
+
+		<div class = "questTO5_1" >
+				Укажите дату:
+		</div>
+			<div  class = "questTO51INP">
+				<br><input type = "date" name = "questTO1date"><br>
+			</div>	
+
+		<div class = "questTO5_2">
+				Укажите пробег:
+		</div>
+			<div class = "questTO52INP" >
+				 <input type="text" size="10">
+		</div>
+
+		<div class = "questTO6" >
+				Как давно вы меняли свечи зажигания? (Если Вы не знаете укажите в пробеге 0)
+		</div>
+
+		<div class = "questTO6_1" >
+				Укажите дату:
+		</div>
+			<div  class = "questTO61INP">
+				<br><input type = "date" name = "questTO1date"><br>
+			</div>	
+
+		<div class = "questTO6_2">
+				Укажите пробег:
+		</div>
+			<div class = "questTO62INP" >
+				 <input type="text" size="10">
+		</div>
+
+		<div class = "questTO7" >
+				Как давно вы меняли топливный фильтр? (Если Вы не знаете укажите в пробеге 0)
+		</div>
+
+		<div class = "questTO7_1" >
+				Укажите дату:
+		</div>
+			<div  class = "questTO71INP">
+				<br><input type = "date" name = "questTO1date"><br>
+			</div>	
+
+		<div class = "questTO7_2">
+				Укажите пробег:
+		</div>
+			<div class = "questTO72INP" >
+				 <input type="text" size="10">
+		</div>
+
+		<div class = "questTO8" >
+				Как давно вы меняли масло в коробке? (Если Вы не знаете укажите в пробеге 0)
+		</div>
+
+		<div class = "questTO8_1" >
+				Укажите дату:
+		</div>
+			<div  class = "questTO81INP">
+				<br><input type = "date" name = "questTO1date"><br>
+			</div>	
+
+		<div class = "questTO8_2">
+				Укажите пробег:
+		</div>
+			<div class = "questTO82INP" >
+				 <input type="text" size="10">
+		</div>
+
+		<div class ="sendQuestBut">
+			<input  type="button"  id= "sendQuestBut" value="Отправить" /> 
+		</div>
+
+
+	<div class = "answer" >
+		<table border= \" 1\"> <tr> <th>Спектр проводимых работ </th> <th>Рекомендация</th> <th>Комментарий</th> </tr>
+
+			<tr> 
+				<td style=\"color:#ff00ff\"> Замена масла и масляного фильтра </td> 
+				<td style=\"color:#ff0000\"> Провести замену</td>
+				<td style=\"color:#ff0000\"> Замену моторного масла и масляного фильтра стоит проводить каждые 7000 км или 10 месяцев </td>
+			</tr>
+			<tr> 
+				<td style=\"color:#ff0000\"> Замена салонного фильтра  </td> 
+				<td style=\"color:#ff0000\"> Провести замену</td>
+				<td style=\"color:#ff0000\"> Замену салонного фильтра стоит проводить каждые 24000 км. или 17 месяцев</td>
+			</tr>
+			<tr> 
+				<td style=\"color:#ff0000\"> Замена воздушного фильтра  </td> 
+				<td style=\"color:#ff0000\"> Провести замену</td>
+				<td style=\"color:#ff0000\"> Замену воздушного фильтра  стоит проводить каждые 25000 км. или 21 месяц</td>
+			</tr>
+			<tr> 
+				<td style=\"color:#ff0000\"> Замена ремень ГРМ/ цепь  </td> 
+				<td style=\"color:#ff0000\"> Провести замену</td>
+				<td style=\"color:#ff0000\"> Замену ремня ГРМ/цепи стоит проводить каждые  25000 км. или 23 месяца</td>
+			</tr>
+			<tr> 
+				<td style=\"color:#ff0000\"> Замена охлаждающей жидкости  </td> 
+				<td style=\"color:#ff0000\"> Провести замену</td>
+				<td style=\"color:#ff0000\"> Замену охлаждающей жидкости двигателя стоит проводить каждые 67000 км. или 36 месяцев</td>
+			</tr>
+			<tr> 
+				<td style=\"color:#ff0000\"> Замена свечей зажигания </td> 
+				<td style=\"color:#ff0000\"> Провести замену</td>
+				<td style=\"color:#ff0000\"> Замену свечей зажигания стоит проводить каждые 27000 км. или 27 месяцев</td>
+			</tr>
+			<tr> 
+				<td style=\"color:#ff0000\"> Замена топливного фильтра</td> 
+				<td style=\"color:#ff0000\"> Провести замену</td>
+				<td style=\"color:#ff0000\"> Замену топливного фильтра  стоит проводить каждые 83000 км. или 66 месяцев </td>
+			</tr>
+			<tr> 
+				<td style=\"color:#ff0000\"> Замена масла в коробке передач  </td> 
+				<td style=\"color:#ff0000\"> Провести замену</td>
+				<td style=\"color:#ff0000\"> Замену масла в коробке передач стоит проводить каждые 35000 км или 31 месяц</td>
+			</tr>
+
+	</div>
+
+	
+	<div class = "table" id = "result"></div>
+	<div class = "confirm" id = "confirm"></div>
+	<script src="ajax.js"></script>
+</form>
+
+</body>
+</html>
+
