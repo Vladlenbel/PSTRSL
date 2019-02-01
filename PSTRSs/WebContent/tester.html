@@ -493,6 +493,73 @@ $(document).ready(function() {
 
 </script>
 
+
+<script id="departWorkHourScr">	
+$(document).ready(function() {
+	var params = 'info=' + 'getDepar';
+	var text = [];
+	var requests = getLastName(params);
+	
+	text = getRequest(requests).split(',');
+	var id = 0;
+	
+	var object ={};
+	var array =[];
+	
+	for(var i = 0; i< text.length; i++){
+	 object = {
+				id: text[i],
+				text: text[i]
+		}
+		array.push(object);
+	}
+	
+	var kol = 0;
+	$(document).ready(function() {
+		$("#departWorkHour").select2({
+		   
+		    placeholder: "Отдел",
+			  allowClear: true,
+			  
+		    query: function (query) {
+		    	 var data = {results: []}, i, j, s;
+		            data.results.push({id: query.term, text: query.term,});
+		            kol = query.term;
+		            var s = 0;
+		           // console.log(data);
+		            for(var j = 0; j< array.length; j++){
+		            	if (query.term.toLowerCase() == array[j].text.substring(0, kol.length).toLowerCase() ){
+		            		var temp = array[s];
+		            		array[s] = array[j];
+		            		array[j] = temp;
+		            		s++;
+		            	}
+		            }
+		            
+		            for(var j = 0; j< array.length; j++){	            	
+		            	data.results.push(array[j]);
+		            }
+		                  
+		        query.callback(data);
+		        
+		    }
+	
+		});
+		
+		/*$('#sound').on('change', function (e) {
+			alert("Selected value is: "+$("#sound").select2("data").text);
+	
+			});*/
+	
+		});
+	
+	/*$('#userSurname').on('change', function (e) {
+		alert("Selected value is: "+$("#e5").select2("val"));
+	
+		});*/
+	});
+</script>
+
 <body>
 
 	<form >
@@ -583,7 +650,7 @@ $(document).ready(function() {
 		</div>
 		
 			<div class = "surnMes" >
-				Введите фамилию: 
+				Введите фамилию работника: 
 			</div>
 				<!-- <div class = "surnMesINP">
     				<select  id="surnMes" size="5" style="width:230px" >  </select>
@@ -622,16 +689,7 @@ $(document).ready(function() {
 			<input  type="button"  id= "sendMesBut" value="Отправить" /> 
 		</div>
 		
-		<div class ="saveBut">
-			
-			<!--  <input type="button" id= "saveBut" style="background-image: url(save.png);" />-->
-			  <button type="button" id= "saveBut" >
-    		<img src="save.png" alt="" style="vertical-align:middle"> 
-  				</button> 
-			<!-- <input  type="button"  id= "saveBut"  /> -->  
-		
-		</div>
-		
+
 		
  		
 		    

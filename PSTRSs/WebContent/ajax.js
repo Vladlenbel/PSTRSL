@@ -55,6 +55,10 @@ window.onload = function(){
 		//	<?php echo "Привет, я - скрипт PHP!";  ?>
 	}
 	
+	document.querySelector('#butWorkHour').onclick = function(){
+	//разработка отправки сообщения	
+	}
+	
 
 }
 

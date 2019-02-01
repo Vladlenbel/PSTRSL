@@ -8,14 +8,16 @@ import java.util.Date;
 
 public class Database {
 	
-	private final String user = /*"root"*/ /*"root"*/"passagesys";
+	private final String user = /*"root"*/ "root"/*"passagesys"*/;
     private final String url = "jdbc:mysql://localhost:3306/passage_system?useUnicode=true&characterEncoding=UTF-8";
-    private final String password =/*"serverps"*//*"valdistroer"*/"AstZhq4";
+    private final String password =/*"serverps"*/"valdistroer"/*"AstZhq4"*/;
 
     private Connection connection;
     private Statement statement;
     private SQLException ex = new SQLException();
     private ResultSet resultSet;
+    
+    private int firstStart = 0;
     
     public Database() {
     	 try {
@@ -120,6 +122,12 @@ public class Database {
 	    	if (statusCom.replaceAll("\n","").equals("Выход")) {
 	    		status = 200;
 	    		}
+	    	if (statusCom.replaceAll("\n","").equals("Автовыход")) {
+	    		status = 201;
+	    		}
+	    	if (statusCom.replaceAll("\n","").equals("Не явился")) {
+	    		status = 300;
+	    		}
     	}
     	String answ = new String();
     	
@@ -179,8 +187,38 @@ public class Database {
 	        		if (Integer.parseInt( resultSet.getString("statuscom")) == 200) {
 	        			statusWord = "Выход";
 	        		}
+	        		if (Integer.parseInt( resultSet.getString("statuscom")) == 201) {
+	        			statusWord = "Автовыход";
+	        		}
+	        		if (Integer.parseInt( resultSet.getString("statuscom")) == 300) {
+	        			statusWord = "Не явился";
+	        		}
+	        		
 	        	int count = 0;
-	        	if( resultSet.getString("surname").equals("Unknown") ) {
+	        	
+	        	if  ( Integer.parseInt( resultSet.getString("statuscom")) == 300 && count == 0 && resultSet.getString("surname").equals("Unknown")) {
+	        		count++;
+	        	}
+	        	if( Integer.parseInt( resultSet.getString("statuscom")) == 300 && count == 0   ) {
+	        		
+	        		String date = resultSet.getString("eventTime");
+		        	String time = date.substring(10);
+		        	String year = date.substring(0,4);
+		        	String month = date.substring(5,7);
+		        	String day = date.substring(8, 10);
+		        	String resultDay = day + "-" + month + "-" + year + " "+ time;
+	        	
+	        		   answ += "<tr>";
+		        	   answ += "<td style=\"color:#ff0000\">"+ resultSet.getString("personellNumber") +" </td>";
+		        	   answ += "<td style=\"color:#ff0000\">"+ resultSet.getString("surname")+" "+ resultSet.getString("name")+ " " +resultSet.getString("patronymic") +" </td>";
+		        	   answ += "<td style=\"color:#ff0000\">"+ resultDay.substring(0,11) +" </td>";
+		        	   answ += "<td style=\"color:#ff0000\">"+ statusWord +" </td>";
+		        	   answ += "<td style=\"color:#ff0000\">"+ resultSet.getString("title") +" </td>";
+		        	   answ += "</tr>";
+		        	   count++;
+	        	}
+	        	
+	        	if( resultSet.getString("surname").equals("Unknown") && count == 0 ) {
 		        	String date = resultSet.getString("eventTime");
 		        	String time = date.substring(10);
 		        	String year = date.substring(0,4);
@@ -226,6 +264,25 @@ public class Database {
 		        	   answ += "</tr>";
 		        	   count++;
 	        	}*/
+	        	if( Integer.parseInt( resultSet.getString("statuscom")) == 201 && count == 0) {
+	        		
+	        		String date = resultSet.getString("eventTime");
+		        	String time = date.substring(10);
+		        	String year = date.substring(0,4);
+		        	String month = date.substring(5,7);
+		        	String day = date.substring(8, 10);
+		        	String resultDay = day + "-" + month + "-" + year + " "+ time;
+	        	
+	        		   answ += "<tr>";
+		        	   answ += "<td style=\"color:#ff8c00\">"+ resultSet.getString("personellNumber") +" </td>";
+		        	   answ += "<td style=\"color:#ff8c00\">"+ resultSet.getString("surname")+" "+ resultSet.getString("name")+ " " +resultSet.getString("patronymic") +" </td>";
+		        	   answ += "<td style=\"color:#ff8c00\">"+ resultDay +" </td>";
+		        	   answ += "<td style=\"color:#ff8c00\">"+ statusWord +" </td>";
+		        	   answ += "<td style=\"color:#ff8c00\">"+ resultSet.getString("title") +" </td>";
+		        	   answ += "</tr>";
+		        	   count++;
+	        	}
+
 	        	if ((Integer.parseInt( resultSet.getString("statuscom")) == 100 || 
 	        			Integer.parseInt( resultSet.getString("statuscom")) == 102 ||
 	        				Integer.parseInt( resultSet.getString("statuscom")) == 200 ) && count == 0) {
@@ -418,6 +475,10 @@ public class Database {
    	return depar;
    }
    public String getFIO() {
+	   if (firstStart == 0) {
+		   new TimeListener().start();
+		   firstStart++;
+	   }
 	   	String fio = new String();
 	   	int index = 0;
 	   	String query = "SELECT *  FROM workerfio;";
@@ -458,6 +519,7 @@ public class Database {
 	       } finally {
 	           closeDB();
 	       } 
+	   	
 	   	// System.out.println(fio);
 	   	return fio;
 	   }
@@ -472,8 +534,10 @@ public class Database {
 		        resultSet = statement.executeQuery(query);
 		        int kol = 0;
 		        while (resultSet.next()) {
-		        	if (kol != 0) {
+		        	if (resultSet.getString("statuscom").equals("102") == false) {
+		        		if (kol != 0 ) {
 		        		status += ",";
+		        		}
 		        	}
 		        	
 		    	    	if (resultSet.getString("statuscom").equals("101")) {
@@ -484,6 +548,12 @@ public class Database {
 		    	    		}
 		    	    	if (resultSet.getString("statuscom").equals("200")) {
 		    	    		status += "Выход";
+		    	    		}
+		    	    	if (resultSet.getString("statuscom").equals("201")) {
+		    	    		status += "Автовыход";
+		    	    		}
+		    	    	if (resultSet.getString("statuscom").equals("300")) {
+		    	    		status += "Не явился";
 		    	    		}
 		        	
 		        	//status+= resultSet.getString("statuscom");
@@ -502,7 +572,7 @@ public class Database {
 	       } finally {
 	           closeDB();
 	       } 
-	   	// System.out.println(status);
+	   	 System.out.println(status);
 	   	return status;
 	   }
    
@@ -543,6 +613,7 @@ public class Database {
    }
    
    public String birthday () {
+	   getHoursWorked("1","СТУ","1","1");
 	   String answ = new String();
 	   
 	   SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM"); //HH:mm:ss");
@@ -612,22 +683,68 @@ public class Database {
        return answ;
    }
    
-   public String getHoursWorked(String typeTime, String department, String fioWorker,String month) {
+   
+   public void findNotCom(String date) {  //простановка статуса не явился
+   	String query = "select * from workerfio inner join department ON workerfio.department = department.id"
+      			+ " where workerIdCard != \"null\" "
+      			+ "and personellNumber NOT IN "
+      			+ "(select workerId from worker where eventTime >="+ "\"" + date+ "\""+" group by workerId)";
+      	try{
+   	        connection = DriverManager.getConnection(url, user, password);
+   	        statement = connection.createStatement();
+   	        resultSet = statement.executeQuery(query);
+   	        while (resultSet.next()) {
+   	        	
+   	        	String insrtQuery = "INSERT INTO worker VALUES(" + 
+   	    				"\"" +  resultSet.getString("workerIdCard") + "\""  + "," +
+   	    				"\"" + date.toString()+" 23:59:00" + "\"" +  "," +
+   	    				"\"" + resultSet.getString("personellNumber")   + "\""  + "," +
+   	    				"\"" + 300 + "\"" + ");" ;
+   	    	   
+   	        	sendQuery(insrtQuery);
+   	        	
+   	        	 //resultSet.getString("personellNumber") ;
+   	        	// resultSet.getString("workerIdCard");
+   	        	   
+   	  
+   	        }
+      	}catch (SQLException e) {
+
+          } finally {
+              closeDB();
+          }  
+   	   
+   }
+   
+   public void getHoursWorked(String typeTime, String department, String fioWorker,String month) {
 	   String hoursWorked = new String();
 	   
 	   int mounthInt = 1;
 	   
-	   Date now = new Date();     // Gets the current date and time
+	   int dayMonth = 31;
+	   
+	 /*  Date now = new Date();     // Gets the current date and time
 	   int year = now.getYear();
+	   */
 	   
-	   Calendar myCalendar = (Calendar) Calendar.getInstance().clone();
-	   myCalendar.set(/*new Date().getYear()*/year, mounthInt, 1);
-	   int max_date = myCalendar.getActualMaximum(Calendar.DAY_OF_MONTH); // колличество дней в месяце
+	   Calendar nowYear = Calendar.getInstance();
+	    // 
+	   int year = nowYear.get(Calendar.YEAR);
+	    System.out.println("Current Year is : " + nowYear.get(Calendar.YEAR));
 	   
-	   if (department.equals("") == false) {
+	String dateStart = Integer.toString(year) +"-"+ month +"-"+ "1";
+	String dateFinish = Integer.toString(year) +"-"+ month +"-"+ "31";
+	//   if (department.equals("") == false) {
 		   
-		   String query = "SELECT * FROM (worker INNER JOIN workerfio ON worker.workerId = workerfio.personellNumber)"
-	    			+ "INNER JOIN department ON workerfio.department = department.id";
+		   /*String query = "SELECT * FROM (worker INNER JOIN workerfio ON worker.workerId = workerfio.personellNumber)"
+	    			+ "INNER JOIN department ON workerfio.department = department.id";*/
+		   
+		   String query = "SELECT * FROM workerfio INNER JOIN department ON workerfio.department = department.id ";
+		   		   
+		   if (department.equals("") == false) {
+	    		query += "where title =" + "\"" + department.replaceAll("\n","") + "\"";
+	    	}
+	    			/*+ "INNER JOIN department ON workerfio.department = department.id";*/
 		   	try{
 			        connection = DriverManager.getConnection(url, user, password);
 			        statement = connection.createStatement();
@@ -635,7 +752,34 @@ public class Database {
 			        int kol = 0;
 			        while (resultSet.next()) {
 			        	
-			        }
+				     	   String queryTime = "SELECT * FROM worker "
+				     		+ " WHERE eventTime >=" + "\"" + dateStart.replaceAll("\n","")+ "\"";	
+				    
+				      		//System.out.println(dateFin);
+				     	  queryTime += "AND eventTime <=" + "\"" + dateFinish.replaceAll("\n","") + "\"";
+				     	  queryTime += "AND personellNumber <=" + "\"" + resultSet.getString("personellNumber") + "\"";
+				   		   
+						   	try{
+							        connection = DriverManager.getConnection(url, user, password);
+							        statement = connection.createStatement();
+							        resultSet = statement.executeQuery(query);
+							        //int kol = 0;
+							        while (resultSet.next()) {
+							        	
+							        	
+							        }
+						   	}catch (SQLException e) {
+	
+						       } finally {
+						           closeDB();
+						       } 
+						   
+				        	
+				        	/*System.out.println( resultSet.getString("surname")+" "+
+				        	resultSet.getString("name")+ " " +resultSet.getString("patronymic") +" " +
+				         	resultSet.getString("title") + " "+
+		        	    	resultSet.getString("personellNumber") );*/
+				        }
 			        	
 		   	}catch (SQLException e) {
 
@@ -645,15 +789,100 @@ public class Database {
 		   
 	   
 	   
-		   if (typeTime == "mounth") {
+		   if (typeTime == "month") {
 			   
 		   }
 	   
-	   }
+	//   }
 	   
 	   
-	   return hoursWorked;
+	  // return hoursWorked;
    }
    
+   public void autoExit (String date) {
+	   String id1 = new String();
+	   String stat1 = new String();
+	   String id2 = new String();
+	   String stat2 = new String();
+	   System.out.println("I'm here");
+	   String query = "SELECT * FROM (worker INNER JOIN workerfio ON worker.workerId = workerfio.personellNumber)"
+   			+ "INNER JOIN department ON workerfio.department = department.id"
+   			+ " WHERE eventTime >=" + "\"" + date+ "\""+" ORDER BY workerId, eventTime";
+	  /* String query = "SELECT * FROM  worker WHERE eventTime >" 
+     			+ "\"" + date + "\""+" ORDER BY workerId";*/
+	   System.out.println(date + " 00:00:00");
+	   System.out.println(query);
+     	try{
+  	        connection = DriverManager.getConnection(url, user, password);
+  	        statement = connection.createStatement();
+  	        resultSet = statement.executeQuery(query);
+  	        
+  	        resultSet.next();
+  	        
+  	        id1 = resultSet.getString("workerID");
+        	stat1 = resultSet.getString("statuscom");
+        	
+        	
+  	        while (resultSet.next()) {
+ 	        	id2 = resultSet.getString("workerID");
+  	        	stat2 = resultSet.getString("statuscom");
+  	        	System.out.println("first rec "+ "id1: " +  id1 + " stat1:" + stat1);
+  	        	System.out.println("second rec " +"id2: " +  id2+ " stat2:"  + stat2);
+  	        	//System.out.println(date);
+  	        	//System.out.println(resultSet.getString("workerID"));
+  	        	
+
+ 
+  	        		if (id1.equals(id2)) {
+  	        			System.out.println("first if");
+  	        			id1 = id2;
+  	        			stat1 = stat2;
+  	        		}
+  	        		else if (Integer.parseInt(stat1) < 200){
+  	        			resultSet.previous();
+  	        			System.out.println("Else if write table");
+  	        			String queryOut = "INSERT INTO worker VALUES(" + 
+  	     	    				"\"" +  resultSet.getString("workerIdCard") + "\""  + "," +
+  	     	    				"\"" + date.toString( ) + " 17:30:00" + "\"" +  "," +
+  	     	    				"\"" + resultSet.getString("personellNumber")   + "\""  + "," +
+  	     	    				"\"" + 201 + "\"" + ");" ;
+  	        			System.out.println(queryOut);
+  	        			sendQuery(queryOut);
+  	        			resultSet.next();
+  	        			id1 = id2;
+  	        			stat1 = stat2;
+  	        			
+  	        		}
+  	        		else {
+  	        			System.out.println("Last else");
+  	        			id1 = id2;
+  	        			stat1 = stat2;
+  	        		}
+  	        		
+  	  	        	if(resultSet.isLast()) {
+  	  	        		if (Integer.parseInt(stat2) < 200){
+  	  	        			System.out.println("Else if write table");
+  	  	        			String queryOut = "INSERT INTO worker VALUES(" + 
+  	  	     	    				"\"" +  resultSet.getString("workerIdCard") + "\""  + "," +
+  	  	     	    				"\"" + date.toString( ) + " 17:30:00" + "\"" +  "," +
+  	  	     	    				"\"" + resultSet.getString("personellNumber")   + "\""  + "," +
+  	  	     	    				"\"" + 201 + "\"" + ");" ;
+  	  	        			System.out.println(queryOut);
+  	  	        			sendQuery(queryOut);
+  	  	        		}
+  	  	        	}
+  	        	
+  	  
+  	        }
+  	        
+     	 }catch (SQLException e) {
+
+         } finally {
+             closeDB();
+         }  
+  	   
+   }
+   
+ 
    
 }
