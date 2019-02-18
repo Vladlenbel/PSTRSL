@@ -3,14 +3,17 @@ package passage_system;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+
+import com.sun.xml.internal.messaging.saaj.packaging.mime.util.QEncoderStream;
 
 
 public class Database {
 	
-	private final String user = /*"root"*/ "root"/*"passagesys"*/;
+	private final String user = /*"root"*//*"root"*/"passagesys";
     private final String url = "jdbc:mysql://localhost:3306/passage_system?useUnicode=true&characterEncoding=UTF-8";
-    private final String password =/*"serverps"*/"valdistroer"/*"AstZhq4"*/;
+    private final String password =/*"serverps"*//*"valdistroer"*/"AstZhq4";
 
     private Connection connection;
     private Statement statement;
@@ -443,6 +446,8 @@ public class Database {
     }
    
    public String getDepar() {
+	  // getHoursWorked( "", "1");
+	   
    	String depar = new String();
    	int index = 0;
    	String query = "SELECT *  FROM department;";
@@ -475,10 +480,15 @@ public class Database {
    	return depar;
    }
    public String getFIO() {
+	   //System.out.println("Индекс запускатора до: "+ firstStart);
 	   if (firstStart == 0) {
-		   new TimeListener().start();
+		   System.out.println("Timer start " + new Date());
+		   new TimeListener().start();    //запускатор расписания
 		   firstStart++;
 	   }
+	   
+	   
+	  // System.out.println("Индекс запускатора после: "+ firstStart);
 	   	String fio = new String();
 	   	int index = 0;
 	   	String query = "SELECT *  FROM workerfio;";
@@ -572,7 +582,7 @@ public class Database {
 	       } finally {
 	           closeDB();
 	       } 
-	   	 System.out.println(status);
+	   //	 System.out.println(status);
 	   	return status;
 	   }
    
@@ -594,12 +604,19 @@ public class Database {
 	        		  "<th>ФИО</th>"+ 
 	        		  "<th>Отдел</th>"+
 	        		  "</tr>";
+	        
 	        while (resultSet.next()) {
+	        	int count = 0;
+	        	if  ( resultSet.getString("surname").equals("Unknown")) {
+	        		count++;
+	        	}
+	        	if (count == 0) {
 	        	answ += "<tr>";
 	        	   answ += "<td>"+ resultSet.getString("personellNumber") +" </td>";
 	        	   answ += "<td>"+ resultSet.getString("surname")+" "+ resultSet.getString("name")+ " " +resultSet.getString("patronymic") +" </td>";
 	        	   answ += "<td>"+ resultSet.getString("title") +" </td>";
 	        	   answ += "</tr>";
+	        	}
 	  
 	        }
    	}catch (SQLException e) {
@@ -613,7 +630,7 @@ public class Database {
    }
    
    public String birthday () {
-	   getHoursWorked("1","СТУ","1","1");
+	   //getHoursWorked("1","СТУ","1","1");
 	   String answ = new String();
 	   
 	   SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM"); //HH:mm:ss");
@@ -634,7 +651,7 @@ public class Database {
 	       while (resultSet.next()) {
 	    	   isEmpty++;
 	       }
-	       System.out.println(isEmpty);
+	      // System.out.println(isEmpty);
 	        //System.out.println(resultSet.wasNull());
 	        if (isEmpty != 0) {
 	        	resultSet.beforeFirst();
@@ -679,7 +696,7 @@ public class Database {
            closeDB();
        }  
 	   
-      	System.out.println("Answer" + answ);
+     // 	System.out.println("Answer" + answ);
        return answ;
    }
    
@@ -695,13 +712,13 @@ public class Database {
    	        resultSet = statement.executeQuery(query);
    	        while (resultSet.next()) {
    	        	
-   	        	String insrtQuery = "INSERT INTO worker VALUES(" + 
+   	        	String insrtNotComQuery = "INSERT INTO worker VALUES(" + 
    	    				"\"" +  resultSet.getString("workerIdCard") + "\""  + "," +
    	    				"\"" + date.toString()+" 23:59:00" + "\"" +  "," +
    	    				"\"" + resultSet.getString("personellNumber")   + "\""  + "," +
    	    				"\"" + 300 + "\"" + ");" ;
    	    	   
-   	        	sendQuery(insrtQuery);
+   	        	sendQuery(insrtNotComQuery);
    	        	
    	        	 //resultSet.getString("personellNumber") ;
    	        	// resultSet.getString("workerIdCard");
@@ -716,8 +733,12 @@ public class Database {
    	   
    }
    
-   public void getHoursWorked(String typeTime, String department, String fioWorker,String month) {
+   public String  getHoursWorked(String calStart, String calFin, String department,/* String fioWorker,*/String month) {
+	   
 	   String hoursWorked = new String();
+	   String result = new String();
+	   
+	   WorkerHourWorkList  workerList = new WorkerHourWorkList();
 	   
 	   int mounthInt = 1;
 	   
@@ -730,88 +751,400 @@ public class Database {
 	   Calendar nowYear = Calendar.getInstance();
 	    // 
 	   int year = nowYear.get(Calendar.YEAR);
-	    System.out.println("Current Year is : " + nowYear.get(Calendar.YEAR));
 	   
-	String dateStart = Integer.toString(year) +"-"+ month +"-"+ "1";
-	String dateFinish = Integer.toString(year) +"-"+ month +"-"+ "31";
-	//   if (department.equals("") == false) {
-		   
-		   /*String query = "SELECT * FROM (worker INNER JOIN workerfio ON worker.workerId = workerfio.personellNumber)"
-	    			+ "INNER JOIN department ON workerfio.department = department.id";*/
-		   
-		   String query = "SELECT * FROM workerfio INNER JOIN department ON workerfio.department = department.id ";
-		   		   
-		   if (department.equals("") == false) {
-	    		query += "where title =" + "\"" + department.replaceAll("\n","") + "\"";
-	    	}
-	    			/*+ "INNER JOIN department ON workerfio.department = department.id";*/
-		   	try{
-			        connection = DriverManager.getConnection(url, user, password);
-			        statement = connection.createStatement();
-			        resultSet = statement.executeQuery(query);
-			        int kol = 0;
-			        while (resultSet.next()) {
-			        	
-				     	   String queryTime = "SELECT * FROM worker "
-				     		+ " WHERE eventTime >=" + "\"" + dateStart.replaceAll("\n","")+ "\"";	
-				    
-				      		//System.out.println(dateFin);
-				     	  queryTime += "AND eventTime <=" + "\"" + dateFinish.replaceAll("\n","") + "\"";
-				     	  queryTime += "AND personellNumber <=" + "\"" + resultSet.getString("personellNumber") + "\"";
-				   		   
-						   	try{
-							        connection = DriverManager.getConnection(url, user, password);
-							        statement = connection.createStatement();
-							        resultSet = statement.executeQuery(query);
-							        //int kol = 0;
-							        while (resultSet.next()) {
-							        	
-							        	
-							        }
-						   	}catch (SQLException e) {
+	  /*  System.out.println("Current Year is : " + nowYear.get(Calendar.YEAR)
+	    	+" Number date: " + nowYear.get(Calendar.DAY_OF_WEEK));*/
+	   
+	String dateStart = new String();
+	String dateFinish = new String();
+			
+	if(month.equals(" ") == false) {
+		 dateStart = Integer.toString(year) +"-"+ month +"-"+ "1 00:00:00";
+		 dateFinish = Integer.toString(year) +"-"+ month +"-"+ "31 23:59:00";
+	}
 	
-						       } finally {
-						           closeDB();
-						       } 
-						   
-				        	
-				        	/*System.out.println( resultSet.getString("surname")+" "+
-				        	resultSet.getString("name")+ " " +resultSet.getString("patronymic") +" " +
-				         	resultSet.getString("title") + " "+
-		        	    	resultSet.getString("personellNumber") );*/
-				        }
-			        	
-		   	}catch (SQLException e) {
+	if(calStart.replaceAll("\n","").equals("") == false && calFin.replaceAll("\n","").equals("") == false) {
+		 dateStart = calStart.replaceAll("\n","") + " 00:00:00";
+		 dateFinish = calFin.replaceAll("\n","") + " 23:59:59";
+	}
+	//   if (department.equals("") == false) {
+	String query = "SELECT * FROM (worker INNER JOIN workerfio ON worker.workerId = workerfio.personellNumber)"
+			+ "INNER JOIN department ON workerfio.department = department.id"
+			+ " WHERE eventTime >=" + "\"" + dateStart+ "\""
+			+ "AND eventTime <=" + "\"" + dateFinish + "\"";
+	
+	if (department.equals("") == false) {
+		query += "AND title =" + "\"" + department.replaceAll("\n","") + "\"";
+	}
+	//query += "AND workerId = \"10240\" ";
+	//query += "AND workerId = \"10300\" ";
+	query += "AND status = \"Работает\" AND surname != \"Unknown\" ORDER BY surname, workerId, eventTime" ;	  
+	
+	System.out.println(query);
+	   	try{
+	        connection = DriverManager.getConnection(url, user, password);
+	        statement = connection.createStatement();
+	        resultSet = statement.executeQuery(query);
+	 /* int kol = 0;
+	        
+	        while (kol == 0) {
+	        	resultSet.next();
+	        	String dateTh = resultSet.getString("eventTime");
+	        	String yearTh = dateTh.substring(0, 4);
+	        	String monthTh = dateTh.substring(5, 7);
+	        	String dayTh = dateTh.substring(8, 10);
+	        	String hoyrTh = dateTh.substring(11, 13);
+	        	String minTh = dateTh.substring(14, 16);
+	        	String secTh = dateTh.substring(17, 19);
+	        	
+	        	System.out.println("current date: " + dateTh);
+	        	System.out.println("Year: "+ yearTh);
+	        	System.out.println("Month: "+ monthTh);
+	        	System.out.println("Day: "+ dayTh);
+	        	System.out.println("Hour: "+ hoyrTh);
+	        	System.out.println("Minute: "+ minTh);
+	        	System.out.println("Second: "+ secTh);
+	        	kol++;
+	        }*/
+	       
+	        
+	        String id_1 = new String();
+	        String id_2 = new String();
+	        
+	        String date_1 = new String();
+	        String date_2 = new String();
+	        
+	        String status_1 = new String();
+	        String status_2 = new String();
+	        
+	        long tempLoseTimeDay = 0;
+	        long hourWork =0;
+	        int autoEx = 0;
+	        int late = 0;
+	        int notCom = 0;
+	        long loseTime = 0;
+	        
+	        long dinnerTime = 1800;
+	        
+	        boolean isLast = false;
+	        
+	        	
+	        resultSet.next();
+	        
+  	        id_1 = resultSet.getString("workerID");
+  	        date_1 = resultSet.getString("eventTime");
+  	        status_1 = resultSet.getString("statuscom");
+  	        
+        	/*String dateTh = resultSet.getString("eventTime");
+        	String yearTh = dateTh.substring(0, 4);
+        	String monthTh = dateTh.substring(5, 7);
+        	String dayTh = dateTh.substring(8, 10);
+        	String hourTh = dateTh.substring(11, 13);
+        	String minTh = dateTh.substring(14, 16);
+        	String secTh = dateTh.substring(17, 19);*/
+  	        
+  	        
+  	        while (resultSet.next()) {
+  	        
+  	        	
+  	        	id_2 = resultSet.getString("workerID");
+  	  	        date_2 = resultSet.getString("eventTime");
+  	  	        status_2 = resultSet.getString("statuscom");
+  	  	        
+  	  	        //System.out.println("st_1: " + status_1);
+  	  	       // System.out.println("st_2: " + status_2);
+  	  	        if (status_1.equals("300")) {
+  	  	    	
+  	  	       
+  	  	        	//	System.out.println(resultSet.getString("workerId")+ " "+ resultSet.getString("eventTime")+ " "  + resultSet.getString("statuscom"));
+  	  	        	
+	        		notCom++;//System.out.println("зашел1");
+	        		
+	        	
+	        		if( status_2.equals("300") ){
+	        			notCom++;//System.out.println("зашел2");
+	        			if(resultSet.isLast() == false) {
+							resultSet.next();  
+						}
+	        		}else {
+	        			//id_1 = id_2;
+	        			date_1 = date_2;
+	        			status_1 = status_2;
+	        			//System.out.println("зашел2.1");
+	        			resultSet.next();
+	        			id_2 = resultSet.getString("workerID");
+	      	  	        date_2 = resultSet.getString("eventTime");
+	      	  	        status_2 = resultSet.getString("statuscom");
+	        		}
+	        	}
+  	  	        if (status_1.equals("300") == false){
+  	  	       // System.out.println("зашел3");
+	        		if(status_1.equals("101")) {
+	        			late++;
+	        		}
+	        		if(status_2.equals("201")) {
+	        			autoEx++;
+	        		}
+  	        //	if (id_1.equals(id_2)) {
+  	        		//if ( date_1.substring(8, 10).equals(date_2.substring(8, 10)) ) {
+	        		//System.out.println(date_1);
+	        		//System.out.println(date_2);
+	        		
+  	        			String hourTh_1 = date_1.substring(11, 13);
+  	        			String minTh_1 = date_1.substring(14, 16);
+  	        			String secTh_1 = date_1.substring(17, 19);
+  	        			
+  	        			/*System.out.println(date_1);
+	        			System.out.println(hourTh_1);
+	        			System.out.println(minTh_1);
+	        			System.out.println(secTh_1);*/
+  	        			
+  	        			String hourTh_2 = date_2.substring(11, 13);
+  	        			String minTh_2 = date_2.substring(14, 16);
+  	        			String secTh_2 = date_2.substring(17, 19);
+  	        			
+  	        			
+  	        			long time_1 = Integer.parseInt(hourTh_1) * 3600 + 
+  	        					Integer.parseInt(minTh_1) * 60 + Integer.parseInt(secTh_1);
+  	        			
+  	        			long time_2 = Integer.parseInt(hourTh_2) * 3600 + 
+  	        					Integer.parseInt(minTh_2) * 60 + Integer.parseInt(secTh_2);
+  	        			
+  	        			hourWork += time_2 - time_1;
+  	        			/*System.out.println("time1:" + time_1);
+  	        			System.out.println("time2:" + time_2);
+  	        			System.out.println("hourWork:" + hourWork);*/
+  	        			if (resultSet.isLast()) {
+  	        				resultSet.previous();
+  	        				tempLoseTimeDay = 0;
+	        					String fio = resultSet.getString("surname")+" "+ resultSet.getString("name")+ " " +resultSet.getString("patronymic");
+	        					String title = resultSet.getString("title");
+	        					
+	        					
+	        					long hourW = 0;
+	        					long minW = 0;
+	        					long secW = 0;
+	        					
+	        					hourW = hourWork/3600;
+	        					minW = (hourWork - hourW*3600)/60;
+	        					secW = hourWork - hourW*3600 - minW*60;
+	        					String hourWorkSt = new String(hourW+":"+minW+":"+secW);
+	        					//System.out.println(hourWork);
+	        					
+	        					long hourL = 0;
+	        					long minL = 0;
+	        					long secL = 0;
+	        					
+	        					hourL = loseTime/3600;
+	        					minL = (loseTime - hourL*3600)/60;
+	        					secL = loseTime - hourL*3600 - minL*60;
+	        					String loseTimeSt = new String(hourL+":"+minL+":"+secL);
 
-		       } finally {
-		           closeDB();
-		       } 
-		   
-	   
-	   
-		   if (typeTime == "month") {
-			   
-		   }
-	   
-	//   }
-	   
-	   
-	  // return hoursWorked;
+	        				workerList.addWorkerHourWorkToList(new WorkerHourWork(fio, title, hourWorkSt, late, autoEx, loseTimeSt,notCom));
+	        				/*System.out.println(fio + " " + title + " " + hourWorkSt+ " " +"late: "+
+	        				late + " " +"autoEx: " + autoEx + " " + loseTimeSt+ " "+"notCom: "+ notCom);
+	        				System.out.println("");*/
+	        				hourWork = 0;
+	        				loseTime = 0;
+	        				late = 0;
+	        				autoEx = 0;
+	        				notCom = 0;
+  	        			}
+  	        			
+  	        			
+  	        			resultSet.next();
+  	        			
+  	        			if(resultSet.getString("statuscom").equals("300") ) {
+  	        				while(resultSet.getString("statuscom").equals("300") & id_1.equals(resultSet.getString("workerID")) ) {
+  	        					notCom++;
+  	        					resultSet.next();
+  	        					//System.out.println("зашел2");
+  	        				}
+  	        			}
+  	        			
+  	        			
+  	        			if( id_2.equals(resultSet.getString("workerID"))  ) {
+  	        				
+  	        			
+	  	        			if ( date_2.substring(8, 10).equals(resultSet.getString("eventTime").substring(8, 10)) ) {
+	  	        				String hourTemp = resultSet.getString("eventTime").substring(11, 13);
+	  	  	        			String minTemp = resultSet.getString("eventTime").substring(14, 16);
+	  	  	        			String secTemp = resultSet.getString("eventTime").substring(17, 19);
+	  	  	        			long tempTime = 0;	  	  	        			  	  	        		
+	  	  	        			 tempTime = Integer.parseInt(hourTemp) * 3600 + 
+	  	  	        					Integer.parseInt(minTemp) * 60 + Integer.parseInt(secTemp);
+	  	  	        		//System.out.println("temp:" + resultSet.getString("workerID") + "  " + resultSet.getString("eventTime") + "tempTime: "+ tempTime + "Time2: " + time_2);
+	  	  	        			tempLoseTimeDay += tempTime - time_2;
+	  	        			}
+	  	        			else
+	  	        				if ( date_2.substring(8, 10).equals(resultSet.getString("eventTime").substring(8, 10)) == false ) {
+	  	        				if(tempLoseTimeDay > dinnerTime) {
+	  	        					//System.out.println(resultSet.getString("workerID") + "  " + tempLoseTimeDay);
+	  	        					loseTime += tempLoseTimeDay - dinnerTime;
+	  	        					hourWork -= dinnerTime;
+	  	        					tempLoseTimeDay = 0;
+	  	        					
+	  	        					//System.out.println(resultSet.getString("workerID") + "  " + resultSet.getString("eventTime"));
+	  	        				}
+	  	        				else {
+	  	        					//System.out.println("else1 " + resultSet.getString("workerID") + "  " + tempLoseTimeDay);
+	  	        					hourWork -= dinnerTime;
+	  	        					tempLoseTimeDay = 0;
+	  	        					//System.out.println("else2 " + resultSet.getString("workerID") + "  " + tempLoseTimeDay);
+	  	        				}
+	  	        			}
+  	        			}else {
+  	        				resultSet.previous();
+  	        				tempLoseTimeDay = 0;
+  	        					String fio = resultSet.getString("surname")+" "+ resultSet.getString("name")+ " " +resultSet.getString("patronymic");
+  	        					String title = resultSet.getString("title");
+  	        					
+  	        					
+  	        					long hourW = 0;
+  	        					long minW = 0;
+  	        					long secW = 0;
+  	        					
+  	        					hourW = hourWork/3600;
+  	        					minW = (hourWork - hourW*3600)/60;
+  	        					secW = hourWork - hourW*3600 - minW*60;
+  	        					String hourWorkSt = new String(hourW+":"+minW+":"+secW);
+  	        					//System.out.println(hourWork);
+  	        					
+  	        					long hourL = 0;
+  	        					long minL = 0;
+  	        					long secL = 0;
+  	        					
+  	        					hourL = loseTime/3600;
+  	        					minL = (loseTime - hourL*3600)/60;
+  	        					secL = loseTime - hourL*3600 - minL*60;
+  	        					String loseTimeSt = new String(hourL+":"+minL+":"+secL);
+
+  	        				workerList.addWorkerHourWorkToList(new WorkerHourWork(fio, title, hourWorkSt, late, autoEx, loseTimeSt,notCom));
+  	        				/*System.out.println(fio + " " + title + " " + hourWorkSt+ " " +"late: "+
+  	        				late + " " +"autoEx: " + autoEx + " " + loseTimeSt+ " "+"notCom: "+ notCom);
+  	        				System.out.println("");*/
+  	        				hourWork = 0;
+  	        				loseTime = 0;
+  	        				late = 0;
+  	        				autoEx = 0;
+  	        				notCom = 0;
+  	        				
+  	        				//if(resultSet.isLast() == false) {
+  	        					resultSet.next();  
+  	        				//} 
+  	        				
+  	        			}
+  	        			
+  	        		//}
+	        	}
+  	  	   // System.out.println("зашел4");
+  	  	        
+  	  	    if(resultSet.getString("statuscom").equals("300") & id_1.equals(resultSet.getString("workerID")) ) {
+  				while(resultSet.getString("statuscom").equals("300") && id_1.equals(resultSet.getString("workerID"))  ) {
+  					notCom++;
+  					resultSet.next();
+  					//System.out.println("зашел2");
+  				}
+  				if(id_2.equals(resultSet.getString("workerID")) == false  ) {
+  				resultSet.previous();
+					String fio = resultSet.getString("surname")+" "+ resultSet.getString("name")+ " " +resultSet.getString("patronymic");
+					String title = resultSet.getString("title");
+					
+					
+					long hourW = 0;
+					long minW = 0;
+					long secW = 0;
+					
+					hourW = hourWork/3600;
+					minW = (hourWork - hourW*3600)/60;
+					secW = hourWork - hourW*3600 - minW*60;
+					String hourWorkSt = new String(hourW+":"+minW+":"+secW);
+					//System.out.println(hourWork);
+					
+					long hourL = 0;
+					long minL = 0;
+					long secL = 0;
+					
+					hourL = loseTime/3600;
+					minL = (loseTime - hourL*3600)/60;
+					secL = loseTime - hourL*3600 - minL*60;
+					String loseTimeSt = new String(hourL+":"+minL+":"+secL);
+
+				workerList.addWorkerHourWorkToList(new WorkerHourWork(fio, title, hourWorkSt, late, autoEx, loseTimeSt,notCom));
+				/*System.out.println(fio + " " + title + " " + hourWorkSt+ " " +"late: "+
+				late + " " +"autoEx: " + autoEx + " " + loseTimeSt+ " "+"notCom: "+ notCom);
+				System.out.println("");*/
+				hourWork = 0;
+				loseTime = 0;
+				late = 0;
+				autoEx = 0;
+				notCom = 0;
+				
+					//if(resultSet.isLast() == false) {
+						resultSet.next();  
+					//}
+  				}
+				
+  			}
+  	  	    
+  	        			id_1 = resultSet.getString("workerID");
+  	        	        date_1 = resultSet.getString("eventTime");
+  	        	        status_1 = resultSet.getString("statuscom");
+  	    //    	}
+  	        	
+  	        	
+	        	
+  	        }
+  	     
+  	    
+		}catch (SQLException e) {
+	
+		} finally {
+	       closeDB();
+		}  
+	   	//Collections.sort(workerList.getWorkerHourWorkList(), String.CASE_INSENSITIVE_ORDER);
+	   	result += "<table border= \" 1\">"+  
+     		  "<tr>"+  
+     		  "<th>ФИО</th>" + 
+     		  "<th>Отдел</th>"+ 
+     		  "<th>Отработанное время</th>"+ 
+     		  "<th>Время отсутсвия</th>"+ 
+     		  "<th>Опоздание</th>"+ 
+     		  "<th>Автовыход</th>"+
+     		  "<th>Не явился</th>"+
+     		  "</tr>";
+	   // System.out.println("1111112");
+	       
+	      for (WorkerHourWork hourWorkL: workerList.getWorkerHourWorkList()){
+	    	  result += "<tr>";
+	    	  result += "<td style=\"color:#0000cd\">"+ hourWorkL.getFIO() +" </td>";
+	    	  result += "<td style=\"color:#0000cd\">"+ hourWorkL.getTitle() +" </td>";
+	    	  result += "<td style=\"color:#0000cd\">"+ hourWorkL.getHourWork() +" </td>";
+	    	  result += "<td style=\"color:#0000cd\">"+ hourWorkL.getLoseTime() +" </td>";
+	    	  result += "<td style=\"color:#0000cd\">"+ hourWorkL.getLate() +" </td>";
+	    	  result += "<td style=\"color:#0000cd\">"+ hourWorkL.getAutoEx() +" </td>";
+	    	  result += "<td style=\"color:#0000cd\">"+ hourWorkL.getNotCom() +" </td>";
+	    	  result += "</tr>";
+	    	/*System.out.println(hourWorkL.getFIO() + " " + hourWorkL.getTitle() + " " + hourWorkL.getHourWork()+ " " +"late: "+
+					hourWorkL.getLate() + " " +"autoEx: " + hourWorkL.getAutoEx() + " " + hourWorkL.getLoseTime()+ " "+"notCom: "+ hourWorkL.getNotCom());
+					System.out.println("");*/
+        } 
+	   // System.out.println("111111");
+	      return result;
    }
    
    public void autoExit (String date) {
 	   String id1 = new String();
 	   String stat1 = new String();
-	   String id2 = new String();
-	   String stat2 = new String();
-	   System.out.println("I'm here");
+	   String id2 = new String();	   String stat2 = new String();
+	   
 	   String query = "SELECT * FROM (worker INNER JOIN workerfio ON worker.workerId = workerfio.personellNumber)"
    			+ "INNER JOIN department ON workerfio.department = department.id"
    			+ " WHERE eventTime >=" + "\"" + date+ "\""+" ORDER BY workerId, eventTime";
 	  /* String query = "SELECT * FROM  worker WHERE eventTime >" 
      			+ "\"" + date + "\""+" ORDER BY workerId";*/
-	   System.out.println(date + " 00:00:00");
-	   System.out.println(query);
+	   //System.out.println(date + " 00:00:00");
+	  // System.out.println(query);
      	try{
   	        connection = DriverManager.getConnection(url, user, password);
   	        statement = connection.createStatement();
@@ -826,27 +1159,27 @@ public class Database {
   	        while (resultSet.next()) {
  	        	id2 = resultSet.getString("workerID");
   	        	stat2 = resultSet.getString("statuscom");
-  	        	System.out.println("first rec "+ "id1: " +  id1 + " stat1:" + stat1);
-  	        	System.out.println("second rec " +"id2: " +  id2+ " stat2:"  + stat2);
+  	        	//System.out.println("first rec "+ "id1: " +  id1 + " stat1:" + stat1);
+  	        	//System.out.println("second rec " +"id2: " +  id2+ " stat2:"  + stat2);
   	        	//System.out.println(date);
   	        	//System.out.println(resultSet.getString("workerID"));
   	        	
 
  
   	        		if (id1.equals(id2)) {
-  	        			System.out.println("first if");
+  	        			//System.out.println("first if");
   	        			id1 = id2;
   	        			stat1 = stat2;
   	        		}
   	        		else if (Integer.parseInt(stat1) < 200){
   	        			resultSet.previous();
-  	        			System.out.println("Else if write table");
+  	        			//System.out.println("Else if write table");
   	        			String queryOut = "INSERT INTO worker VALUES(" + 
   	     	    				"\"" +  resultSet.getString("workerIdCard") + "\""  + "," +
   	     	    				"\"" + date.toString( ) + " 17:30:00" + "\"" +  "," +
   	     	    				"\"" + resultSet.getString("personellNumber")   + "\""  + "," +
   	     	    				"\"" + 201 + "\"" + ");" ;
-  	        			System.out.println(queryOut);
+  	        			//System.out.println(queryOut);
   	        			sendQuery(queryOut);
   	        			resultSet.next();
   	        			id1 = id2;
@@ -854,20 +1187,20 @@ public class Database {
   	        			
   	        		}
   	        		else {
-  	        			System.out.println("Last else");
+  	        			//System.out.println("Last else");
   	        			id1 = id2;
   	        			stat1 = stat2;
   	        		}
   	        		
   	  	        	if(resultSet.isLast()) {
   	  	        		if (Integer.parseInt(stat2) < 200){
-  	  	        			System.out.println("Else if write table");
+  	  	        			//System.out.println("Else if write table");
   	  	        			String queryOut = "INSERT INTO worker VALUES(" + 
   	  	     	    				"\"" +  resultSet.getString("workerIdCard") + "\""  + "," +
   	  	     	    				"\"" + date.toString( ) + " 17:30:00" + "\"" +  "," +
   	  	     	    				"\"" + resultSet.getString("personellNumber")   + "\""  + "," +
   	  	     	    				"\"" + 201 + "\"" + ");" ;
-  	  	        			System.out.println(queryOut);
+  	  	        			//System.out.println(queryOut);
   	  	        			sendQuery(queryOut);
   	  	        		}
   	  	        	}

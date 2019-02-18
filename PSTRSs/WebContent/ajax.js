@@ -16,6 +16,12 @@ window.onload = function(){
 	var inp_select = document.querySelector("supsel");
 	var inp_request = document.getElementById("fastRequestSel");
 	
+	var inp_typePer = document.getElementById("typeComWorkHour")
+	var inp_month = document.getElementById("monthWorkHour");
+	var inp_departWorkHour = document.querySelector('input[name = departWorkHour]');
+	
+	var inp_calStart_work = document.querySelector('input[name = calendarStartWork]');
+	var inp_calFin_work = document.querySelector('input[name = calendarFinWork]');
 	
 	document.querySelector('#but').onclick = function(){
 		
@@ -31,7 +37,7 @@ window.onload = function(){
 	document.querySelector('#requeBut').onclick = function(){
 		
 		var params = 'request=' + inp_request.options[inp_request.selectedIndex].value;
-		console.log(params);
+		//console.log(params);
 		ajaxRequestPost(params);
 	}
 	
@@ -45,7 +51,7 @@ window.onload = function(){
 	}
 	
 
-	document.querySelector('#saveBut').onclick = function(){
+/*	document.querySelector('#saveBut').onclick = function(){
 		//alert($("#supsel").select2("val"));
 		var params = 'surnMes=' + $("#surnMes").select2("val") + 
 		'&' + 'typeMes=' + inp_typeMes.options[inp_typeMes.selectedIndex].value + 
@@ -54,9 +60,16 @@ window.onload = function(){
 		//ajaxPostSave(params);
 		//	<?php echo "Привет, я - скрипт PHP!";  ?>
 	}
-	
+	*/
 	document.querySelector('#butWorkHour').onclick = function(){
 	//разработка отправки сообщения	
+		
+		var params = 'calStart=' + inp_calStart_work.value + 
+		'&' + 'calFin=' + inp_calFin_work.value +
+		'&' + 'depart=' + $("#departWorkHour").select2("val") + 
+		'&' + 'month=' + inp_month.options[inp_month.selectedIndex].value;
+		ajaxHoursWork(params);
+		
 	}
 	
 
@@ -115,6 +128,20 @@ function ajaxConfirmPost(params){
 	}
 	
 	request.open('POST', 'AddRecord');
+	request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	request.send(params);
+}
+
+function ajaxHoursWork(params){
+	var request = new XMLHttpRequest();
+	
+	request.onreadystatechange = function(){
+			if(request.readyState == 4 && request.status ==200){
+				document.querySelector('#result').innerHTML = request.responseText;
+			}
+	}
+	
+	request.open('POST', 'HoursWork');
 	request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 	request.send(params);
 }
