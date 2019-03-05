@@ -11,9 +11,9 @@ import com.sun.xml.internal.messaging.saaj.packaging.mime.util.QEncoderStream;
 
 public class Database {
 	
-	private final String user = /*"root"*//*"root"*/"passagesys";
+	private final String user = /*"root"*/"root"/*"passagesys"*/;
     private final String url = "jdbc:mysql://localhost:3306/passage_system?useUnicode=true&characterEncoding=UTF-8";
-    private final String password =/*"serverps"*//*"valdistroer"*/"AstZhq4";
+    private final String password =/*"serverps"*/"valdistroer"/*"AstZhq4"*/;
 
     private Connection connection;
     private Statement statement;
@@ -131,6 +131,9 @@ public class Database {
 	    	if (statusCom.replaceAll("\n","").equals("Не явился")) {
 	    		status = 300;
 	    		}
+	    	if (statusCom.replaceAll("\n","").equals("Ранний выход")) {
+	    		status = 202;
+	    		}
     	}
     	String answ = new String();
     	
@@ -195,6 +198,9 @@ public class Database {
 	        		}
 	        		if (Integer.parseInt( resultSet.getString("statuscom")) == 300) {
 	        			statusWord = "Не явился";
+	        		}
+	        		if (Integer.parseInt( resultSet.getString("statuscom")) == 202) {
+	        			statusWord = "Ранний уход";
 	        		}
 	        		
 	        	int count = 0;
@@ -282,6 +288,25 @@ public class Database {
 		        	   answ += "<td style=\"color:#ff8c00\">"+ resultDay +" </td>";
 		        	   answ += "<td style=\"color:#ff8c00\">"+ statusWord +" </td>";
 		        	   answ += "<td style=\"color:#ff8c00\">"+ resultSet.getString("title") +" </td>";
+		        	   answ += "</tr>";
+		        	   count++;
+	        	}
+	        	
+	        	if(Integer.parseInt( resultSet.getString("statuscom")) == 202 && count == 0) {
+	        		
+	        		String date = resultSet.getString("eventTime");
+		        	String time = date.substring(10);
+		        	String year = date.substring(0,4);
+		        	String month = date.substring(5,7);
+		        	String day = date.substring(8, 10);
+		        	String resultDay = day + "-" + month + "-" + year + " "+ time;
+	        	
+	        		   answ += "<tr>";
+		        	   answ += "<td style=\"color:#8b008b\">"+ resultSet.getString("personellNumber") +" </td>";
+		        	   answ += "<td style=\"color:#8b008b\">"+ resultSet.getString("surname")+" "+ resultSet.getString("name")+ " " +resultSet.getString("patronymic") +" </td>";
+		        	   answ += "<td style=\"color:#8b008b\">"+ resultDay +" </td>";
+		        	   answ += "<td style=\"color:#8b008b\">"+ statusWord +" </td>";
+		        	   answ += "<td style=\"color:#8b008b\">"+ resultSet.getString("title") +" </td>";
 		        	   answ += "</tr>";
 		        	   count++;
 	        	}
@@ -565,6 +590,9 @@ public class Database {
 		    	    	if (resultSet.getString("statuscom").equals("300")) {
 		    	    		status += "Не явился";
 		    	    		}
+		    	    	if (resultSet.getString("statuscom").equals("202")) {
+		    	    		status += "Ранний выход";
+		    	    		}
 		        	
 		        	//status+= resultSet.getString("statuscom");
 		        	kol++;
@@ -822,6 +850,7 @@ public class Database {
 	        int autoEx = 0;
 	        int late = 0;
 	        int notCom = 0;
+	        int exitEqrly = 0;
 	        long loseTime = 0;
 	        
 	        long dinnerTime = 1800;
@@ -885,6 +914,9 @@ public class Database {
 	        		if(status_2.equals("201")) {
 	        			autoEx++;
 	        		}
+	        		if(status_2.equals("202")) {
+	        			exitEqrly++;
+	        		}
   	        //	if (id_1.equals(id_2)) {
   	        		//if ( date_1.substring(8, 10).equals(date_2.substring(8, 10)) ) {
 	        		//System.out.println(date_1);
@@ -940,7 +972,7 @@ public class Database {
 	        					secL = loseTime - hourL*3600 - minL*60;
 	        					String loseTimeSt = new String(hourL+":"+minL+":"+secL);
 
-	        				workerList.addWorkerHourWorkToList(new WorkerHourWork(fio, title, hourWorkSt, late, autoEx, loseTimeSt,notCom));
+	        				workerList.addWorkerHourWorkToList(new WorkerHourWork(fio, title, hourWorkSt, late, autoEx, loseTimeSt,notCom, exitEqrly));
 	        				/*System.out.println(fio + " " + title + " " + hourWorkSt+ " " +"late: "+
 	        				late + " " +"autoEx: " + autoEx + " " + loseTimeSt+ " "+"notCom: "+ notCom);
 	        				System.out.println("");*/
@@ -949,6 +981,7 @@ public class Database {
 	        				late = 0;
 	        				autoEx = 0;
 	        				notCom = 0;
+	        				exitEqrly = 0;
   	        			}
   	        			
   	        			
@@ -1019,7 +1052,7 @@ public class Database {
   	        					secL = loseTime - hourL*3600 - minL*60;
   	        					String loseTimeSt = new String(hourL+":"+minL+":"+secL);
 
-  	        				workerList.addWorkerHourWorkToList(new WorkerHourWork(fio, title, hourWorkSt, late, autoEx, loseTimeSt,notCom));
+  	        				workerList.addWorkerHourWorkToList(new WorkerHourWork(fio, title, hourWorkSt, late, autoEx, loseTimeSt,notCom, exitEqrly));
   	        				/*System.out.println(fio + " " + title + " " + hourWorkSt+ " " +"late: "+
   	        				late + " " +"autoEx: " + autoEx + " " + loseTimeSt+ " "+"notCom: "+ notCom);
   	        				System.out.println("");*/
@@ -1028,7 +1061,7 @@ public class Database {
   	        				late = 0;
   	        				autoEx = 0;
   	        				notCom = 0;
-  	        				
+  	        				exitEqrly = 0;
   	        				//if(resultSet.isLast() == false) {
   	        					resultSet.next();  
   	        				//} 
@@ -1070,7 +1103,7 @@ public class Database {
 					secL = loseTime - hourL*3600 - minL*60;
 					String loseTimeSt = new String(hourL+":"+minL+":"+secL);
 
-				workerList.addWorkerHourWorkToList(new WorkerHourWork(fio, title, hourWorkSt, late, autoEx, loseTimeSt,notCom));
+				workerList.addWorkerHourWorkToList(new WorkerHourWork(fio, title, hourWorkSt, late, autoEx, loseTimeSt,notCom,exitEqrly));
 				/*System.out.println(fio + " " + title + " " + hourWorkSt+ " " +"late: "+
 				late + " " +"autoEx: " + autoEx + " " + loseTimeSt+ " "+"notCom: "+ notCom);
 				System.out.println("");*/
@@ -1079,6 +1112,7 @@ public class Database {
 				late = 0;
 				autoEx = 0;
 				notCom = 0;
+				exitEqrly = 0;
 				
 					//if(resultSet.isLast() == false) {
 						resultSet.next();  
@@ -1112,6 +1146,7 @@ public class Database {
      		  "<th>Опоздание</th>"+ 
      		  "<th>Автовыход</th>"+
      		  "<th>Не явился</th>"+
+     		  "<th>Ранниый выход</th>"+
      		  "</tr>";
 	   // System.out.println("1111112");
 	       
@@ -1124,6 +1159,7 @@ public class Database {
 	    	  result += "<td style=\"color:#0000cd\">"+ hourWorkL.getLate() +" </td>";
 	    	  result += "<td style=\"color:#0000cd\">"+ hourWorkL.getAutoEx() +" </td>";
 	    	  result += "<td style=\"color:#0000cd\">"+ hourWorkL.getNotCom() +" </td>";
+	    	  result += "<td style=\"color:#0000cd\">"+ hourWorkL.getExitEarly() +" </td>";
 	    	  result += "</tr>";
 	    	/*System.out.println(hourWorkL.getFIO() + " " + hourWorkL.getTitle() + " " + hourWorkL.getHourWork()+ " " +"late: "+
 					hourWorkL.getLate() + " " +"autoEx: " + hourWorkL.getAutoEx() + " " + hourWorkL.getLoseTime()+ " "+"notCom: "+ hourWorkL.getNotCom());
@@ -1164,19 +1200,26 @@ public class Database {
   	        	//System.out.println(date);
   	        	//System.out.println(resultSet.getString("workerID"));
   	        	
-
- 
+  	        	String outTime = " 17:30:00"; 
+  	        		
   	        		if (id1.equals(id2)) {
   	        			//System.out.println("first if");
-  	        			id1 = id2;
+  	        			//id1 = id2;
   	        			stat1 = stat2;
   	        		}
-  	        		else if (Integer.parseInt(stat1) < 200){
-  	        			resultSet.previous();
+  	        		else {
+  	        			if (Integer.parseInt(stat1) < 200){
+  	        				resultSet.previous();
+  	        			
+  	        				if (Integer.parseInt(resultSet.getString("eventTime").substring(11, 13)) >= 17 &&
+  	        					Integer.parseInt(resultSet.getString("eventTime").substring(14, 16))>= 30) {
+  	        				outTime =" " + resultSet.getString("eventTime").substring(11, 13)+ ":" +
+  	        						(Integer.parseInt(resultSet.getString("eventTime").substring(14, 16))+1) + ":"+"00";
+  	        				}	
   	        			//System.out.println("Else if write table");
   	        			String queryOut = "INSERT INTO worker VALUES(" + 
   	     	    				"\"" +  resultSet.getString("workerIdCard") + "\""  + "," +
-  	     	    				"\"" + date.toString( ) + " 17:30:00" + "\"" +  "," +
+  	     	    				"\"" + date.toString( ) + outTime + "\"" +  "," +
   	     	    				"\"" + resultSet.getString("personellNumber")   + "\""  + "," +
   	     	    				"\"" + 201 + "\"" + ");" ;
   	        			//System.out.println(queryOut);
@@ -1185,24 +1228,110 @@ public class Database {
   	        			id1 = id2;
   	        			stat1 = stat2;
   	        			
-  	        		}
-  	        		else {
-  	        			//System.out.println("Last else");
-  	        			id1 = id2;
-  	        			stat1 = stat2;
+  	        			}else {
+  	        				resultSet.previous();
+  	        				if (Integer.parseInt(resultSet.getString("eventTime").substring(11, 13)) < 17) {
+  	        					String  sqlSafeOff = "SET SQL_SAFE_UPDATES = 0;";
+  	        					sendQuery(sqlSafeOff);
+  	        				
+  	        					String queryOutEarly = "update worker set statuscom = '202' where workerId = " + 
+  	        						"\"" + resultSet.getString("personellNumber")   + "\""  + "and eventTime = " +
+  	  	     	    				"\"" + resultSet.getString("eventTime") + "\"" +  ";" ;
+  	  	        			//System.out.println(queryOut);
+  	        					sendQuery(queryOutEarly);
+  	        					resultSet.next();
+  	        					id1 = id2;
+  	    	        			stat1 = stat2;
+  	  	        			
+  	        					String  sqlSafeOn = "SET SQL_SAFE_UPDATES = 1;";
+  	        					sendQuery(sqlSafeOn);	
+  	        				}else if (Integer.parseInt(resultSet.getString("eventTime").substring(11, 13)) <= 17 &&
+		        					Integer.parseInt(resultSet.getString("eventTime").substring(14, 16)) <= 29 ) {
+	  	        			
+	  	        			//System.out.println("Last else");
+	  	        				String  sqlSafeOff = "SET SQL_SAFE_UPDATES = 0;";
+	  	        				sendQuery(sqlSafeOff);
+	  	        				
+	  	        				String queryOutEarly = "update worker set statuscom = '202' where workerId = " + 
+	  	        						"\"" + resultSet.getString("personellNumber")   + "\""  + "and eventTime = " +
+	  	  	     	    				"\"" + resultSet.getString("eventTime") + "\"" +  ";" ;
+	  	  	        			//System.out.println(queryOut);
+	  	  	        			sendQuery(queryOutEarly);
+	  	  	        			resultSet.next();
+	  	  	        			
+	  	  	        			id1 = id2;
+	  	  	        			stat1 = stat2;
+	  	  	        			String  sqlSafeOn = "SET SQL_SAFE_UPDATES = 1;";
+		        				sendQuery(sqlSafeOn);
+	  	  	        			
+	  	        				
+  	        				}else {
+  	        					resultSet.next();
+  	        					id1 = id2;
+  	        					stat1 = stat2;
+  	        				}
+  	        			}
   	        		}
   	        		
   	  	        	if(resultSet.isLast()) {
   	  	        		if (Integer.parseInt(stat2) < 200){
+  	  	        			
+  	  	        		if (Integer.parseInt(resultSet.getString("eventTime").substring(11, 13)) >= 17 &&
+  	        					Integer.parseInt(resultSet.getString("eventTime").substring(14, 16))>= 30) {
+  	        				outTime =" " + resultSet.getString("eventTime").substring(11, 13)+ ":" +
+  	        						(Integer.parseInt(resultSet.getString("eventTime").substring(14, 16))+1) + ":"+"00";
+  	        			}
   	  	        			//System.out.println("Else if write table");
   	  	        			String queryOut = "INSERT INTO worker VALUES(" + 
   	  	     	    				"\"" +  resultSet.getString("workerIdCard") + "\""  + "," +
-  	  	     	    				"\"" + date.toString( ) + " 17:30:00" + "\"" +  "," +
+  	  	     	    			"\"" + date.toString( ) + outTime + "\"" +  "," +
   	  	     	    				"\"" + resultSet.getString("personellNumber")   + "\""  + "," +
   	  	     	    				"\"" + 201 + "\"" + ");" ;
   	  	        			//System.out.println(queryOut);
   	  	        			sendQuery(queryOut);
-  	  	        		}
+  	  	        		}else {
+  	        				resultSet.previous();
+  	        				if (Integer.parseInt(resultSet.getString("eventTime").substring(11, 13)) < 17) {
+  	        					String  sqlSafeOff = "SET SQL_SAFE_UPDATES = 0;";
+  	        					sendQuery(sqlSafeOff);
+  	        				
+  	        					String queryOutEarly = "update worker set statuscom = '202' where workerId = " + 
+  	        						"\"" + resultSet.getString("personellNumber")   + "\""  + "and eventTime = " +
+  	  	     	    				"\"" + resultSet.getString("eventTime") + "\"" +  ";" ;
+  	  	        			//System.out.println(queryOut);
+  	        					sendQuery(queryOutEarly);
+  	        					resultSet.next();
+  	        					id1 = id2;
+  	    	        			stat1 = stat2;
+  	  	        			
+  	        					String  sqlSafeOn = "SET SQL_SAFE_UPDATES = 1;";
+  	        					sendQuery(sqlSafeOn);	
+  	        				}else if (Integer.parseInt(resultSet.getString("eventTime").substring(11, 13)) <= 17 &&
+		        					Integer.parseInt(resultSet.getString("eventTime").substring(14, 16)) <= 29 ) {
+	  	        			
+	  	        			//System.out.println("Last else");
+	  	        				String  sqlSafeOff = "SET SQL_SAFE_UPDATES = 0;";
+	  	        				sendQuery(sqlSafeOff);
+	  	        				
+	  	        				String queryOutEarly = "update worker set statuscom = '202' where workerId = " + 
+	  	        						"\"" + resultSet.getString("personellNumber")   + "\""  + "and eventTime = " +
+	  	  	     	    				"\"" + resultSet.getString("eventTime") + "\"" +  ";" ;
+	  	  	        			//System.out.println(queryOut);
+	  	  	        			sendQuery(queryOutEarly);
+	  	  	        			resultSet.next();
+	  	  	        			
+	  	  	        			id1 = id2;
+	  	  	        			stat1 = stat2;
+	  	  	        			String  sqlSafeOn = "SET SQL_SAFE_UPDATES = 1;";
+		        				sendQuery(sqlSafeOn);
+	  	  	        			
+	  	        				
+  	        				}else {
+  	        					resultSet.next();
+  	        					id1 = id2;
+  	        					stat1 = stat2;
+  	        				}
+  	        			}
   	  	        	}
   	        	
   	  

@@ -11,8 +11,9 @@ public class WorkerHourWork {
 	private int autoEx;
 	private String loseTime;
 	private int notCom;
+	private int exitEarly;
 
-	public WorkerHourWork(String fio, String title, String hourWork, int late, int autoEx, String loseTime, int notCom ) {
+	public WorkerHourWork(String fio, String title, String hourWork, int late, int autoEx, String loseTime, int notCom, int exitEarly ) {
 		this.fio = fio;
 		this.title = title;
 		this.hourWork = hourWork;
@@ -20,6 +21,7 @@ public class WorkerHourWork {
 		this.autoEx = autoEx;
 		this.loseTime = loseTime;
 		this.notCom = notCom;
+		this.exitEarly = exitEarly;
 		
 	}
 	
@@ -49,5 +51,8 @@ public class WorkerHourWork {
 	
 	public int getNotCom() {
 		return notCom;
+	}
+	public int getExitEarly() {
+		return exitEarly;
 	}
 }
