@@ -22,6 +22,12 @@ public class Database {
     
     private int firstStart = 0;
     
+    
+    private Connection connection1;
+    private Statement statement1;
+    private SQLException ex1 = new SQLException();
+    private ResultSet resultSet1;
+    
     public Database() {
     	 try {
          	// System.out.println("class foundStart");
@@ -63,7 +69,16 @@ public class Database {
         } catch (SQLException e) {
         	System.out.println("Ошибка");
         }
-    }  
+    } 
+    private void closeDB1() {
+        try {
+            connection1.close();
+            statement1.close();
+            resultSet1.close();
+        } catch (SQLException e) {
+        	System.out.println("Ошибка");
+        }
+    } 
     
     public void addRecordTime(String  id ) {
     	SimpleDateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
@@ -134,6 +149,12 @@ public class Database {
 	    	if (statusCom.replaceAll("\n","").equals("Ранний выход")) {
 	    		status = 202;
 	    		}
+	    	if (statusCom.replaceAll("\n","").equals("Отпуск")) {
+	    		status = 301;
+	    		}
+	    	if (statusCom.replaceAll("\n","").equals("Больничный")) {
+	    		status = 302;
+	    		}
     	}
     	String answ = new String();
     	
@@ -202,6 +223,12 @@ public class Database {
 	        		if (Integer.parseInt( resultSet.getString("statuscom")) == 202) {
 	        			statusWord = "Ранний уход";
 	        		}
+	        		if (Integer.parseInt( resultSet.getString("statuscom")) == 301) {
+	        			statusWord = "Отпуск";
+	        		}
+	        		if (Integer.parseInt( resultSet.getString("statuscom")) == 302) {
+	        			statusWord = "Больничный";
+	        		}
 	        		
 	        	int count = 0;
 	        	
@@ -228,7 +255,7 @@ public class Database {
 	        	}
 	        	
 	        	if( resultSet.getString("surname").equals("Unknown") && count == 0 ) {
-		        	String date = resultSet.getString("eventTime");
+		        	/*String date = resultSet.getString("eventTime");
 		        	String time = date.substring(10);
 		        	String year = date.substring(0,4);
 		        	String month = date.substring(5,7);
@@ -240,7 +267,7 @@ public class Database {
 		        	   answ += "<td style=\"color:#0000cd\">"+ resultDay +" </td>";
 		        	   answ += "<td style=\"color:#0000cd\">"+ statusWord +" </td>";
 		        	   answ += "<td style=\"color:#0000cd\">"+ resultSet.getString("title") +" </td>";
-		        	   answ += "</tr>";
+		        	   answ += "</tr>";*/
 		        	   count++;
 	        	}
 	        	if( Integer.parseInt( resultSet.getString("statuscom")) == 101 && count == 0) {
@@ -292,6 +319,26 @@ public class Database {
 		        	   count++;
 	        	}
 	        	
+	        	if( Integer.parseInt( resultSet.getString("statuscom")) == 301 ||
+	        			Integer.parseInt( resultSet.getString("statuscom")) == 302	&& count == 0) {
+	        		
+	        		String date = resultSet.getString("eventTime");
+		        	String time = date.substring(10);
+		        	String year = date.substring(0,4);
+		        	String month = date.substring(5,7);
+		        	String day = date.substring(8, 10);
+		        	String resultDay = day + "-" + month + "-" + year + " "+ time;
+	        	
+	        		   answ += "<tr>";
+		        	   answ += "<td style=\"color:#008000\">"+ resultSet.getString("personellNumber") +" </td>";
+		        	   answ += "<td style=\"color:#008000\">"+ resultSet.getString("surname")+" "+ resultSet.getString("name")+ " " +resultSet.getString("patronymic") +" </td>";
+		        	   answ += "<td style=\"color:#008000\">"+ resultDay +" </td>";
+		        	   answ += "<td style=\"color:#008000\">"+ statusWord +" </td>";
+		        	   answ += "<td style=\"color:#008000\">"+ resultSet.getString("title") +" </td>";
+		        	   answ += "</tr>";
+		        	   count++;
+	        	}
+	        	
 	        	if(Integer.parseInt( resultSet.getString("statuscom")) == 202 && count == 0) {
 	        		
 	        		String date = resultSet.getString("eventTime");
@@ -302,11 +349,11 @@ public class Database {
 		        	String resultDay = day + "-" + month + "-" + year + " "+ time;
 	        	
 	        		   answ += "<tr>";
-		        	   answ += "<td style=\"color:#8b008b\">"+ resultSet.getString("personellNumber") +" </td>";
-		        	   answ += "<td style=\"color:#8b008b\">"+ resultSet.getString("surname")+" "+ resultSet.getString("name")+ " " +resultSet.getString("patronymic") +" </td>";
-		        	   answ += "<td style=\"color:#8b008b\">"+ resultDay +" </td>";
-		        	   answ += "<td style=\"color:#8b008b\">"+ statusWord +" </td>";
-		        	   answ += "<td style=\"color:#8b008b\">"+ resultSet.getString("title") +" </td>";
+		        	   answ += "<td style=\"color:#0000cd\">"+ resultSet.getString("personellNumber") +" </td>";
+		        	   answ += "<td style=\"color:#0000cd\">"+ resultSet.getString("surname")+" "+ resultSet.getString("name")+ " " +resultSet.getString("patronymic") +" </td>";
+		        	   answ += "<td style=\"color:#0000cd\">"+ resultDay +" </td>";
+		        	   answ += "<td style=\"color:#0000cd\">"+ statusWord +" </td>";
+		        	   answ += "<td style=\"color:#0000cd\">"+ resultSet.getString("title") +" </td>";
 		        	   answ += "</tr>";
 		        	   count++;
 	        	}
@@ -593,6 +640,12 @@ public class Database {
 		    	    	if (resultSet.getString("statuscom").equals("202")) {
 		    	    		status += "Ранний выход";
 		    	    		}
+		        		if (resultSet.getString("statuscom").equals("301")) {
+		        			status += "Отпуск";
+		        		}
+		        		if (resultSet.getString("statuscom").equals("302")) {
+		        			status += "Больничный";
+		        		}
 		        	
 		        	//status+= resultSet.getString("statuscom");
 		        	kol++;
@@ -631,21 +684,38 @@ public class Database {
 	        		   "<th>ID</th>" + 
 	        		  "<th>ФИО</th>"+ 
 	        		  "<th>Отдел</th>"+
+	        		  "<th>Причина неявки</th>"+
 	        		  "</tr>";
 	        
 	        while (resultSet.next()) {
+	        //	System.out.println("date  " +date);
+	        	String queryVac = "select * FROM vacation where "+ "\"" + date+ "\""+" "
+	        			+ "between startVacation and finishVacation and personellNumber = "+ "\"" + resultSet.getString("personellNumber")+ "\"";
+	        //	System.out.println("Query  " +queryVac);
 	        	int count = 0;
 	        	if  ( resultSet.getString("surname").equals("Unknown")) {
 	        		count++;
 	        	}
 	        	if (count == 0) {
 	        	answ += "<tr>";
-	        	   answ += "<td>"+ resultSet.getString("personellNumber") +" </td>";
-	        	   answ += "<td>"+ resultSet.getString("surname")+" "+ resultSet.getString("name")+ " " +resultSet.getString("patronymic") +" </td>";
-	        	   answ += "<td>"+ resultSet.getString("title") +" </td>";
+	        	
+	        	String answer = new String();
+	        	   answer = getReasonForAbsence(queryVac);
+	        	   
+	        	   if ( answer.equals("nullres")) {
+	        		   answ += "<td>"+ resultSet.getString("personellNumber") +" </td>";
+		        	   answ += "<td>"+ resultSet.getString("surname")+" "+ resultSet.getString("name")+ " " +resultSet.getString("patronymic") +" </td>";
+		        	   answ += "<td>"+ resultSet.getString("title") +" </td>";
+		        	   answ += "<td>"+ "Причина не установлена" +" </td>";
+	        	   }else {
+	          	   answ += "<td style=\"color:#008000\">"+ resultSet.getString("personellNumber") +" </td>";
+	        	   answ += "<td style=\"color:#008000\">"+ resultSet.getString("surname")+" "+ resultSet.getString("name")+ " " +resultSet.getString("patronymic") +" </td>";
+	        	   answ += "<td style=\"color:#008000\">"+ resultSet.getString("title") +" </td>";
+	        	   answ += "<td style=\"color:#008000\">"+ answer +" </td>";
+	        	   }
 	        	   answ += "</tr>";
 	        	}
-	  
+	   
 	        }
    	}catch (SQLException e) {
 
@@ -656,6 +726,29 @@ public class Database {
 	   
 	   return answ;
    }
+   
+   private String getReasonForAbsence(String query) {
+	   String answ = "nullres";
+
+	   try{
+	        connection1 = DriverManager.getConnection(url, user, password);
+	        statement1 = connection1.createStatement();
+	        resultSet1 = statement1.executeQuery(query);
+	 //       int kol = 0;
+	        while (resultSet1.next()) {
+	        	answ = resultSet1.getString("typeOfAbsence");
+	        }
+	        	
+  	}catch (SQLException e1) {
+
+      } finally {
+    	 closeDB1();
+      } 
+  	
+  
+  	return answ;
+   }
+   
    
    public String birthday () {
 	   //getHoursWorked("1","СТУ","1","1");
@@ -740,13 +833,33 @@ public class Database {
    	        resultSet = statement.executeQuery(query);
    	        while (resultSet.next()) {
    	        	
-   	        	String insrtNotComQuery = "INSERT INTO worker VALUES(" + 
+   	        	String queryVac = "select * FROM vacation where "+ "\"" + date+ "\""+" "
+	        			+ "between startVacation and finishVacation and personellNumber = "+ "\"" + resultSet.getString("personellNumber")+ "\"";
+   	        	String answRes = getReasonForAbsence(queryVac);
+   	        	
+   	        	if(answRes.equals("nullres")) {
+   	        	
+   	        		String insrtNotComQuery = "INSERT INTO worker VALUES(" + 
    	    				"\"" +  resultSet.getString("workerIdCard") + "\""  + "," +
    	    				"\"" + date.toString()+" 23:59:00" + "\"" +  "," +
    	    				"\"" + resultSet.getString("personellNumber")   + "\""  + "," +
    	    				"\"" + 300 + "\"" + ");" ;
-   	    	   
-   	        	sendQuery(insrtNotComQuery);
+   	        		sendQuery(insrtNotComQuery);
+   	        	}else {
+   	        		String statusEmpt = new String();
+   	        			if (answRes.equals("Больничный")) {
+   	        				statusEmpt = "302";
+   	        			}
+   	        			if (answRes.equals("Отпуск")) {
+   	        				statusEmpt = "301";
+   	        			}
+   	        			String insrtNotComQuerys = "INSERT INTO worker VALUES(" + 
+   	    	    				"\"" +  resultSet.getString("workerIdCard") + "\""  + "," +
+   	    	    				"\"" + date.toString()+" 23:59:00" + "\"" +  "," +
+   	    	    				"\"" + resultSet.getString("personellNumber")   + "\""  + "," +
+   	    	    				"\"" + statusEmpt + "\"" + ");" ;
+   	        			sendQuery(insrtNotComQuerys);
+   	        	}
    	        	
    	        	 //resultSet.getString("personellNumber") ;
    	        	// resultSet.getString("workerIdCard");

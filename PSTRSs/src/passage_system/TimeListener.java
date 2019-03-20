@@ -59,7 +59,7 @@ class GoOutTime extends TimerTask {
     			int hour = Integer.parseInt(curHourMin.substring(0, 2));
     			int min = Integer.parseInt(curHourMin.substring(3, 5));
     			System.out.println("Time schedule " +  curHourMin );
-    			if(hour >= 21 && min >= 00) {//23:39
+    			if(hour >= 23 && min >= 39) {//23:39
 	    			//System.out.println("begin");
 	    			System.out.println("Today date: " + curDate +" Number date: " + nowDate.get(Calendar.DAY_OF_WEEK) );
 	    			System.out.println("Today date with hour: " + new Date() );
